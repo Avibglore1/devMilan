@@ -4,10 +4,11 @@ const PORT = 3000;
 const connectDB = require("./config/db.js");
 const User = require("./models/user.js");
 
+require("dotenv").config();
 app.use(express.json());
 app.post("/signup", async(req,res)=>{
   const user = new User(req.body);
-  
+
   try {
     await user.save();
     res.send("User added successfully");
