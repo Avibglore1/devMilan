@@ -8,17 +8,18 @@ dotenv.config();
 
 app.use(express.json());
 
-app.patch('/updateUser', async(req,res)=>{
-  try {
-    const userId = req.body.userId;
+// app.patch('/updateUser', async(req,res)=>{
+//   try {
+//     const userId = req.body.userId;
 
-    const data = req.body;
-    await User.findByIdAndUpdate(userId,data);
-    res.send("user data updated successfully");
-  } catch (error) {
-    res.status(500).send("Spmething went wrong")
-  }
-})
+//     const data = req.body;
+//     await User.findByIdAndUpdate(userId,data);
+//     res.send("user data updated successfully");
+//   } catch (error) {
+//     res.status(500).send("Spmething went wrong")
+//   }
+// }
+// )
 // app.delete("/deleteUser", async(req,res)=>{
 //   try {
 //     const userId = req.body.userId;
@@ -48,16 +49,16 @@ app.patch('/updateUser', async(req,res)=>{
 //   }
 // })
 
-// app.post("/signup", async(req,res)=>{
-//   const user = new User(req.body);
+app.post("/signup", async(req,res)=>{
+  const user = new User(req.body);
 
-//   try {
-//     await user.save();
-//     res.send("User added successfully");
-//   } catch (error) {
-//     res.status(500).send("Error saving the user: ", error.message)
-//   }
-// })
+  try {
+    await user.save();
+    res.send("User added successfully");
+  } catch (error) {
+    res.status(500).send("Error saving the user: " + error.message)
+  }
+})
 
 connectDB().then(()=>{
     console.log("Db connection established");
