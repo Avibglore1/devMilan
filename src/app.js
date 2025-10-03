@@ -4,6 +4,9 @@ const PORT = 3000;
 import {connectDB} from "./config/db.js";
 import {User} from "./models/user.js";
 import dotenv from "dotenv";
+import { validateSignupData } from "./utils/validation.js";
+import bcrypt from "bcrypt";
+
 dotenv.config();
 
 app.use(express.json());
@@ -50,9 +53,14 @@ app.use(express.json());
 // })
 
 app.post("/signup", async(req,res)=>{
-  const user = new User(req.body);
 
   try {
+    validateSignupData(req);
+    const {firstName,lastName,emailId,password}  =req.body;
+    const hashPassword = await  bcrypt.hash(password,10);
+    const user = new User({
+      firstName,lastName,emailId,password:hashPassword
+    });
     await user.save();
     res.send("User added successfully");
   } catch (error) {
@@ -60,6 +68,23 @@ app.post("/signup", async(req,res)=>{
   }
 })
 
+app.post("/login", async(req,res)=>{
+  try {
+    const {emailId,password} = req.body;
+    if(!emailId || !password) throw new Error("EmailId or Password required");
+
+    const user = await User.findOne({emailId:emailId});
+    if(!user) throw new Error ("Invalid Credential");
+
+    const isPasswordValid = await bcrypt.compare(password,user.password);
+    if(!isPasswordValid) throw new Error("Invalid Credential");
+
+    res.send('Login Successfull');
+
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
+  }
+})
 connectDB().then(()=>{
     console.log("Db connection established");
     app.listen(PORT,()=>{
