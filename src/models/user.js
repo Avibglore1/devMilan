@@ -36,10 +36,18 @@ const userSchema = new mongoose.Schema({
         type: Number,
         min: 18
     },
+    about:{
+        type: String
+    },
     gender:{
         type: String,
-        enum: ['male','female','others'],
-        message: 'gender must be male,female or others'
+        enum: {
+            values: ['male','female','others'],
+            message: `{values} is not supported gender type`
+        }        
+    },
+    skills:{
+        type: Array
     }
 },{timestamps: true});
 
