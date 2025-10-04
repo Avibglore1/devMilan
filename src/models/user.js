@@ -1,5 +1,7 @@
 import mongoose  from "mongoose";
 import validator from "validator";
+import jwt from "jsonwebtoken";
+
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -40,6 +42,12 @@ const userSchema = new mongoose.Schema({
         message: 'gender must be male,female or others'
     }
 },{timestamps: true});
+
+userSchema.methods.getJWT = async function(req,res){
+    const user = this;
+    const token = jwt.sign({_id:user._id},process.env.JWT_SECRET_KEY,{expiresIn: "7d"});
+    return token
+}
 
 export const User = mongoose.model("User",userSchema);
 

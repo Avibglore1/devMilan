@@ -6,10 +6,14 @@ import {User} from "./models/user.js";
 import dotenv from "dotenv";
 import { validateSignupData } from "./utils/validation.js";
 import bcrypt from "bcrypt";
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
+import { userAuth } from "./middlewares/userAuth.js";
 
 dotenv.config();
 
 app.use(express.json());
+app.use(cookieParser());
 
 // app.patch('/updateUser', async(req,res)=>{
 //   try {
@@ -23,6 +27,7 @@ app.use(express.json());
 //   }
 // }
 // )
+
 // app.delete("/deleteUser", async(req,res)=>{
 //   try {
 //     const userId = req.body.userId;
@@ -32,6 +37,7 @@ app.use(express.json());
 //     res.status(500).send("Something went wrong")
 //   }
 // })
+
 // app.get("/feed", async(req,res)=>{
 //   try{
 //     const users = await User.find({});
@@ -53,7 +59,6 @@ app.use(express.json());
 // })
 
 app.post("/signup", async(req,res)=>{
-
   try {
     validateSignupData(req);
     const {firstName,lastName,emailId,password}  =req.body;
@@ -79,12 +84,24 @@ app.post("/login", async(req,res)=>{
     const isPasswordValid = await bcrypt.compare(password,user.password);
     if(!isPasswordValid) throw new Error("Invalid Credential");
 
-    res.send('Login Successfull');
+    const token = await user.getJWT();
 
+    res.cookie("jwt",token)
+    res.send('Login Successfull');
   } catch (error) {
-    res.status(500).send("Error: " + error.message);
+  res.status(500).send("Error: " + error.message)
   }
 })
+
+app.get("/profile", userAuth, async(req,res)=>{
+  try {
+    const user = req.user;
+    res.send(user);
+  } catch (error) {
+  res.status(500).send("Error: " +error.message)
+  }
+})
+
 connectDB().then(()=>{
     console.log("Db connection established");
     app.listen(PORT,()=>{
