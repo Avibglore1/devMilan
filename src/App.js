@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { authRouter } from "./routes/auth.js";
 import { profileRouter } from "./routes/profile.js";
 import { requestRouter } from "./routes/request.js";
+import { userRouter } from "./routes/userConnection.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
+app.use("/", userRouter)
 
 const PORT = 3000;
 connectDB().then(()=>{
