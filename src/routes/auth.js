@@ -22,6 +22,8 @@ authRouter.post("/signup", async(req,res)=>{
 authRouter.post("/login", async(req,res)=>{
   try {
     const {emailId,password} = req.body;
+    
+    
     if(!emailId || !password) throw new Error("EmailId or Password required");
 
     const user = await User.findOne({emailId:emailId});
@@ -33,7 +35,7 @@ authRouter.post("/login", async(req,res)=>{
     const token = await user.getJWT();
 
     res.cookie("jwt",token)
-    res.send('Login Successfull');
+    res.send(user);
   } catch (error) {
   res.status(500).send("Error: " + error.message)
   }
